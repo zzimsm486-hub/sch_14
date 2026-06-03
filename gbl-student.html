@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>GBL 미션카드 — 학생용</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E4A;--navy2:#2A4A72;--navy3:#3D6494;
+  --orange:#E8650A;--orange2:#F5893A;--orangePl:#FDF0E6;
+  --teal:#1D9E75;--tealPl:#E1F5EE;
+  --gold:#F5A623;--goldPl:#FEF3E2;
+  --gray:#64748B;--grayLt:#F4F6F8;--grayBd:#CBD5E0;
+  --white:#FFFFFF;--text:#1A202C;--textSub:#4A5568;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--grayLt);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.app-header{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.app-header .logo{width:36px;height:36px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;}
+.app-header h1{font-size:16px;font-weight:600;color:#fff;line-height:1.2;}
+.app-header p{font-size:12px;color:#AABCD0;margin-top:1px;}
+.app-header .step-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;white-space:nowrap;}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{padding:20px;}
+.setup-card{background:var(--white);border-radius:16px;padding:24px;border:1px solid var(--grayBd);max-width:480px;margin:0 auto;}
+.setup-card h2{font-size:18px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.setup-card p{font-size:13px;color:var(--textSub);margin-bottom:20px;line-height:1.6;}
+.field-label{font-size:13px;font-weight:500;color:var(--textSub);margin-bottom:6px;display:block;}
+.field-input{width:100%;border:1.5px solid var(--grayBd);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);background:#fff;outline:none;transition:border .15s;}
+.field-input:focus{border-color:var(--orange);}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.role-btn{border:1.5px solid var(--grayBd);border-radius:10px;padding:12px;text-align:center;cursor:pointer;background:#fff;transition:all .15s;}
+.role-btn.active{border-color:var(--orange);background:var(--orangePl);}
+.role-btn .role-icon{font-size:22px;margin-bottom:4px;}
+.role-btn .role-name{font-size:13px;font-weight:600;color:var(--navy);}
+.role-btn .role-desc{font-size:11px;color:var(--textSub);margin-top:2px;}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.team-btn{border:1.5px solid var(--grayBd);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;background:#fff;transition:all .15s;}
+.team-btn.active{border-color:var(--orange);background:var(--orangePl);}
+.team-btn .t-num{font-size:20px;font-weight:700;color:var(--orange);}
+.team-btn .t-name{font-size:12px;color:var(--textSub);margin-top:2px;}
+.btn-start{width:100%;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-start:hover{background:#C8550A;}
+.btn-start:disabled{background:var(--grayBd);cursor:not-allowed;}
+
+/* ── MISSION SCREEN ── */
+#mission-screen{display:none;padding:16px;}
+.mission-nav{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;}
+.mission-tab{flex-shrink:0;border:1.5px solid var(--grayBd);border-radius:20px;padding:7px 16px;font-size:13px;font-weight:500;color:var(--textSub);cursor:pointer;background:#fff;transition:all .15s;white-space:nowrap;}
+.mission-tab.active{border-color:var(--orange);background:var(--orange);color:#fff;}
+.mission-tab.done{border-color:var(--teal);background:var(--tealPl);color:var(--teal);}
+.mission-card{background:#fff;border-radius:16px;border:1px solid var(--grayBd);overflow:hidden;margin-bottom:12px;}
+.mission-head{padding:16px 18px;display:flex;align-items:center;gap:12px;}
+.mission-badge{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;}
+.mission-head-info h3{font-size:15px;font-weight:600;color:var(--navy);}
+.mission-head-info p{font-size:12px;color:var(--textSub);margin-top:2px;}
+.mission-desc{padding:0 18px 16px;font-size:13px;color:var(--textSub);line-height:1.7;background:var(--grayLt);border-top:1px solid var(--grayBd);padding-top:12px;}
+.mission-desc strong{color:var(--navy);}
+.field-group{padding:0 18px 18px;}
+.field-group label{font-size:12px;font-weight:500;color:var(--textSub);display:block;margin:14px 0 5px;}
+.field-group textarea{width:100%;border:1.5px solid var(--grayBd);border-radius:10px;padding:12px;font-size:14px;color:var(--text);resize:vertical;min-height:90px;font-family:inherit;outline:none;transition:border .15s;line-height:1.6;}
+.field-group textarea:focus{border-color:var(--orange);}
+.submit-row{padding:0 18px 18px;display:flex;gap:8px;align-items:center;}
+.btn-submit{flex:1;background:var(--navy);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-submit:hover{background:var(--navy2);}
+.btn-submit.done{background:var(--teal);}
+.save-status{font-size:12px;color:var(--textSub);flex-shrink:0;}
+.save-status.ok{color:var(--teal);}
+
+/* ── REFLECTION ── */
+.reflect-card{background:#fff;border-radius:16px;border:1px solid var(--grayBd);padding:18px;margin-bottom:12px;}
+.reflect-card h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.reflect-card p{font-size:12px;color:var(--textSub);margin-bottom:12px;line-height:1.6;}
+.reflect-card textarea{width:100%;border:1.5px solid var(--grayBd);border-radius:10px;padding:12px;font-size:14px;color:var(--text);resize:vertical;min-height:80px;font-family:inherit;outline:none;transition:border .15s;line-height:1.6;}
+.reflect-card textarea:focus{border-color:var(--orange);}
+.btn-final{width:100%;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;}
+
+/* ── COMPLETE ── */
+#complete-screen{display:none;padding:40px 20px;text-align:center;}
+.complete-icon{font-size:56px;margin-bottom:16px;}
+.complete-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.complete-sub{font-size:14px;color:var(--textSub);line-height:1.7;margin-bottom:24px;}
+.score-badge{display:inline-block;background:var(--orangePl);color:var(--orange);font-size:28px;font-weight:700;padding:16px 32px;border-radius:16px;border:2px solid var(--orange);margin-bottom:20px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{padding:12px 20px 0;max-width:480px;margin:0 auto;}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--textSub);margin-bottom:5px;}
+.progress-bar{height:6px;background:var(--grayBd);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--orange);border-radius:3px;transition:width .4s;}
+
+/* ── SPINNER ── */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     ★ Firebase 설정 — 본인 프로젝트 값으로 교체
+     ══════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue, push, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FIREBASE_CONFIG = {
+  apiKey:            "여기에_API_KEY",
+  authDomain:        "여기에_PROJECT.firebaseapp.com",
+  databaseURL:       "여기에_https://PROJECT.firebaseio.com",
+  projectId:         "여기에_PROJECT_ID",
+  storageBucket:     "여기에_PROJECT.appspot.com",
+  messagingSenderId: "여기에_SENDER_ID",
+  appId:             "여기에_APP_ID"
+};
+/* ══════════════════════════════════════════ */
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getDatabase(app);
+
+const SESSION = 'gbl2024';   // 세션 키 — 강사용과 동일하게 맞출 것
+
+/* ── 상태 ── */
+let myTeam = null, myName = '', myRole = '';
+let answers = { m1:{}, m2:{}, m3:{}, reflect:{} };
+let submittedMissions = new Set();
+let currentMission = 'm1';
+
+const TEAMS = [
+  {id:'t1', num:'1조', name:'나침반'},
+  {id:'t2', num:'2조', name:'씨앗'},
+  {id:'t3', num:'3조', name:'파도'},
+  {id:'t4', num:'4조', name:'별자리'},
+];
+const ROLES = [
+  {id:'leader',   icon:'🧭', name:'리더',     desc:'조 진행 총괄'},
+  {id:'recorder', icon:'📝', name:'기록자',   desc:'논의 내용 정리'},
+  {id:'presenter',icon:'🎤', name:'발표자',   desc:'결과 발표'},
+  {id:'timer',    icon:'⏱',  name:'시간관리자', desc:'진행 체크'},
+];
+
+/* ── 렌더링 ── */
+window.addEventListener('DOMContentLoaded', () => {
+  renderSetup();
+  document.getElementById('btn-start').addEventListener('click', startSession);
+});
+
+function renderSetup(){
+  // 이름 입력
+  const inp = document.getElementById('name-input');
+
+  // 팀 버튼
+  const tg = document.getElementById('team-grid');
+  tg.innerHTML = '';
+  TEAMS.forEach(t => {
+    const b = document.createElement('div');
+    b.className = 'team-btn'; b.dataset.id = t.id;
+    b.innerHTML = `<div class="t-num">${t.num}</div><div class="t-name">${t.name}</div>`;
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.team-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); myTeam = t;
+    });
+    tg.appendChild(b);
+  });
+
+  // 역할 버튼
+  const rg = document.getElementById('role-grid');
+  rg.innerHTML = '';
+  ROLES.forEach(r => {
+    const b = document.createElement('div');
+    b.className = 'role-btn'; b.dataset.id = r.id;
+    b.innerHTML = `<div class="role-icon">${r.icon}</div><div class="role-name">${r.name}</div><div class="role-desc">${r.desc}</div>`;
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.role-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); myRole = r.name;
+    });
+    rg.appendChild(b);
+  });
+}
+
+function startSession(){
+  myName = document.getElementById('name-input').value.trim();
+  if(!myName){ showToast('이름을 입력해주세요'); return; }
+  if(!myTeam){ showToast('조를 선택해주세요'); return; }
+  if(!myRole){ showToast('역할을 선택해주세요'); return; }
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('mission-screen').style.display = 'block';
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('app-header-info').textContent = `${myTeam.num} · ${myName} · ${myRole}`;
+
+  registerMember();
+  renderMissions();
+  loadAnswers();
+}
+
+function registerMember(){
+  const path = `${SESSION}/members/${myTeam.id}/${myName.replace(/\s/g,'_')}`;
+  set(ref(db, path), { name: myName, role: myRole, team: myTeam.num, joined: serverTimestamp() });
+}
+
+/* ── 미션 렌더링 ── */
+const MISSIONS = [
+  {
+    id:'m1', label:'M1 목표설정', color:'#E8650A', time:'5분',
+    title:'목표 설정 — 청소년 집단상담 프로그램 기획',
+    desc:'청소년 집단상담 프로그램의 목표를 설정하고, GBL 4요소(목표·규칙·피드백·자발적 참여) 중 3가지 이상을 반영하는 방법을 구체적으로 제시하세요.',
+    fields:[
+      {key:'target',  label:'① 대상 청소년 집단 (구체적으로)', placeholder:'예) 학교폭력 피해 경험 중학생 / 진로 미결정 고등학생 등'},
+      {key:'goals',   label:'② 프로그램 목표 3가지 이상', placeholder:'예)\n1. 자기효능감 향상\n2. 또래 관계 개선\n3. 진로 탐색 동기 증진'},
+      {key:'gbl',     label:'③ 반영할 GBL 요소 3가지 + 적용 방법', placeholder:'예)\n- 규칙 → 차례 지키기 원칙 명시\n- 피드백 → 점수판 즉시 공개\n- 참여 → 역할카드 학생이 직접 선택'},
+    ]
+  },
+  {
+    id:'m2', label:'M2 시나리오', color:'#1D9E75', time:'10분',
+    title:'시나리오 작성 — 1회기 게임화 활동 설계',
+    desc:'1회기(50분) 집단상담 활동을 게임 형식으로 시나리오화하세요. 도입-전개-마무리 단계, 사용 도구, 촉진자(상담사) 역할을 모두 포함해야 합니다.',
+    fields:[
+      {key:'intro',    label:'① 도입 단계 (___분) — 준비·규칙 설명', placeholder:'예) 역할카드 배분 → 게임 규칙 안내 → 아이스브레이킹 활동'},
+      {key:'main',     label:'② 전개 단계 (___분) — 핵심 게임 활동', placeholder:'예) 미션카드 수행 → 실시간 점수 부여 → 중간 피드백 제공'},
+      {key:'close',    label:'③ 마무리 단계 (___분) — 정리·공유', placeholder:'예) 조별 발표 → 소감 한 줄 나누기 → 촉진자 총평'},
+      {key:'tools',    label:'④ 사용 도구·자료 목록', placeholder:'예) 미션카드, 점수판, 타이머, A3 용지, 마커펜, 스티커'},
+      {key:'facilitator', label:'⑤ 촉진자 역할 및 개입 방법', placeholder:'예) 규칙 중재 / 소극적 참여자 격려 / 갈등 상황 개입 기준'},
+    ]
+  },
+  {
+    id:'m3', label:'M3 루브릭', color:'#F5A623', time:'10분',
+    title:'루브릭 설계 — 참여자 평가 기준 만들기',
+    desc:'참여자 평가 루브릭(3개 기준 이상)을 작성하고, 즉각적 피드백 방식과 마무리 정리 방법을 함께 제시하세요.',
+    fields:[
+      {key:'rubric',   label:'① 평가 루브릭 (기준 / 우수 / 보통 / 미흡 형식)', placeholder:'예)\n참여도 | 매 활동 적극 참여 | 대부분 참여 | 소극적\n창의성 | 독창적 아이디어 | 표준적 수행 | 단순 반복\n협력도 | 구성원 배려 탁월 | 기본 협력 | 개인 위주'},
+      {key:'feedback', label:'② 즉각적 피드백 방식', placeholder:'예) 미션 완료 즉시 스티커 부착 + 점수판 업데이트 + 언어적 강화'},
+      {key:'wrap',     label:'③ 마무리 정리 방법', placeholder:'예) 루브릭 점수 합산 → 조별 시상 → 소감 나누기 → 차시 예고'},
+    ]
+  },
+  {
+    id:'reflect', label:'성찰', color:'#2A4A72', time:'10분',
+    title:'개인 성찰 — 오늘 수업 돌아보기',
+    desc:'아래 3가지 질문에 솔직하게 작성하고 제출하면 +5점이 부여됩니다.',
+    fields:[
+      {key:'q1', label:'① 오늘 수업에서 가장 인상 깊었던 장면은?', placeholder:'구체적인 순간이나 활동을 떠올려 쓰세요.'},
+      {key:'q2', label:'② 게임기반 학습의 핵심 원리 중 내가 직접 경험한 것은?', placeholder:'목표 / 규칙 / 피드백 / 자발적 참여 중 선택하여 서술'},
+      {key:'q3', label:'③ 청소년 상담 현장에서 오늘 배운 GBL을 어떻게 활용할까?', placeholder:'구체적인 상담 상황과 연결하여 서술'},
+    ]
+  }
+];
+
+function renderMissions(){
+  const nav = document.getElementById('mission-nav');
+  const body = document.getElementById('mission-body');
+  nav.innerHTML = ''; body.innerHTML = '';
+
+  MISSIONS.forEach(m => {
+    // 탭
+    const tab = document.createElement('div');
+    tab.className = 'mission-tab' + (m.id === 'm1' ? ' active' : '');
+    tab.textContent = m.label;
+    tab.dataset.id = m.id;
+    tab.addEventListener('click', () => switchMission(m.id));
+    nav.appendChild(tab);
+
+    // 컨텐츠 패널
+    const panel = document.createElement('div');
+    panel.id = 'panel-' + m.id;
+    panel.style.display = m.id === 'm1' ? 'block' : 'none';
+
+    panel.innerHTML = `
+      <div class="mission-card">
+        <div class="mission-head">
+          <div class="mission-badge" style="background:${m.color}">${m.id === 'reflect' ? '✍' : m.id.toUpperCase()}</div>
+          <div class="mission-head-info">
+            <h3>${m.title}</h3>
+            <p>제한 시간: ${m.time}</p>
+          </div>
+        </div>
+        <div class="mission-desc">${m.desc}</div>
+        <div class="field-group" id="fields-${m.id}"></div>
+        <div class="submit-row">
+          <button class="btn-submit" id="submit-${m.id}" onclick="submitMission('${m.id}')">
+            ${m.id === 'reflect' ? '성찰 제출 (+5점)' : m.id.toUpperCase() + ' 제출 — 완료!'}
+          </button>
+          <span class="save-status" id="status-${m.id}">자동 저장 중...</span>
+        </div>
+      </div>
+    `;
+
+    const fg = panel.querySelector(`#fields-${m.id}`);
+    m.fields.forEach(f => {
+      const lbl = document.createElement('label');
+      lbl.textContent = f.label;
+      const ta = document.createElement('textarea');
+      ta.placeholder = f.placeholder;
+      ta.dataset.key = f.key;
+      ta.dataset.mission = m.id;
+      ta.rows = 4;
+      ta.addEventListener('input', () => autoSave(m.id, f.key, ta.value));
+      fg.appendChild(lbl);
+      fg.appendChild(ta);
+    });
+
+    body.appendChild(panel);
+  });
+
+  updateProgress();
+}
+
+function switchMission(id){
+  currentMission = id;
+  document.querySelectorAll('.mission-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.id === id);
+  });
+  MISSIONS.forEach(m => {
+    const p = document.getElementById('panel-' + m.id);
+    if(p) p.style.display = m.id === id ? 'block' : 'none';
+  });
+}
+
+/* ── Firebase 연동 ── */
+function autoSave(missionId, fieldKey, value){
+  if(!myTeam) return;
+  const path = `${SESSION}/submissions/${myTeam.id}/${missionId}/${fieldKey}`;
+  set(ref(db, path), { value, name: myName, role: myRole, updatedAt: serverTimestamp() });
+  const st = document.getElementById('status-' + missionId);
+  if(st){ st.textContent = '저장됨 ✓'; st.className = 'save-status ok'; }
+}
+
+function loadAnswers(){
+  const path = `${SESSION}/submissions/${myTeam.id}`;
+  onValue(ref(db, path), snap => {
+    const data = snap.val() || {};
+    MISSIONS.forEach(m => {
+      m.fields.forEach(f => {
+        const ta = document.querySelector(`textarea[data-mission="${m.id}"][data-key="${f.key}"]`);
+        if(ta && data[m.id]?.[f.key]?.value && !ta.value){
+          ta.value = data[m.id][f.key].value;
+        }
+      });
+      if(data[m.id]?._submitted){
+        markSubmitted(m.id);
+      }
+    });
+  });
+}
+
+window.submitMission = function(missionId){
+  const btn = document.getElementById('submit-' + missionId);
+  btn.innerHTML = '<span class="spinner"></span>제출 중...';
+  btn.disabled = true;
+
+  const path = `${SESSION}/submissions/${myTeam.id}/${missionId}/_submitted`;
+  set(ref(db, path), { by: myName, role: myRole, at: serverTimestamp() })
+    .then(() => {
+      markSubmitted(missionId);
+      showToast(missionId === 'reflect' ? '성찰 제출 완료! +5점 🎉' : `${missionId.toUpperCase()} 완료 제출! 🏆`);
+
+      // 로그
+      push(ref(db, `${SESSION}/log`), {
+        team: myTeam.num, teamId: myTeam.id,
+        member: myName, role: myRole,
+        event: `${missionId}_submitted`, at: serverTimestamp()
+      });
+
+      if(missionId === 'reflect') checkAllDone();
+      else {
+        const next = {m1:'m2', m2:'m3', m3:'reflect'}[missionId];
+        if(next) setTimeout(() => switchMission(next), 800);
+      }
+    })
+    .catch(() => {
+      btn.innerHTML = '다시 시도';
+      btn.disabled = false;
+      showToast('네트워크 오류. 다시 시도해주세요.');
+    });
+};
+
+function markSubmitted(missionId){
+  submittedMissions.add(missionId);
+  const btn = document.getElementById('submit-' + missionId);
+  if(btn){ btn.textContent = '✓ 제출 완료'; btn.className = 'btn-submit done'; btn.disabled = true; }
+  const tab = document.querySelector(`.mission-tab[data-id="${missionId}"]`);
+  if(tab){ tab.classList.remove('active'); tab.classList.add('done'); }
+  const st = document.getElementById('status-' + missionId);
+  if(st){ st.textContent = '제출 완료'; st.className = 'save-status ok'; }
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = MISSIONS.length;
+  const done = submittedMissions.size;
+  const pct = Math.round(done / total * 100);
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label-done');
+  if(fill) fill.style.width = pct + '%';
+  if(label) label.textContent = `${done} / ${total} 완료`;
+}
+
+function checkAllDone(){
+  if(submittedMissions.size >= MISSIONS.length){
+    setTimeout(() => {
+      document.getElementById('mission-screen').style.display = 'none';
+      document.getElementById('complete-screen').style.display = 'block';
+    }, 1000);
+  }
+}
+
+/* ── 토스트 ── */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
+<!-- ── DOM ── -->
+<div class="app-header" id="app-header">
+  <div class="logo">GBL</div>
+  <div>
+    <h1>미션카드 워크시트</h1>
+    <p id="app-header-info">게임기반 학습 · 청소년교육상담학과</p>
+  </div>
+  <div class="step-badge" id="progress-label-done">0 / 4 완료</div>
+</div>
+
+<!-- 진행률 -->
+<div class="progress-wrap" id="progress-wrap" style="display:none">
+  <div class="progress-label">
+    <span>진행률</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<!-- 설정 화면 -->
+<div id="setup-screen" style="padding-top:20px">
+  <div class="setup-card">
+    <h2>수업 시작 전 정보 입력</h2>
+    <p>아래 정보를 입력하면 조별 미션카드가 열립니다.<br>강사 대시보드에 실시간으로 연동됩니다.</p>
+
+    <label class="field-label">이름</label>
+    <input type="text" id="name-input" class="field-input" placeholder="예) 김민준" style="margin-bottom:20px">
+
+    <label class="field-label">소속 조 선택</label>
+    <div class="team-grid" id="team-grid"></div>
+
+    <label class="field-label">역할 선택</label>
+    <div class="role-grid" id="role-grid" style="grid-template-columns:1fr 1fr;margin-bottom:24px"></div>
+
+    <button class="btn-start" id="btn-start">미션 시작하기 →</button>
+  </div>
+</div>
+
+<!-- 미션 화면 -->
+<div id="mission-screen" style="display:none">
+  <div class="mission-nav" id="mission-nav"></div>
+  <div id="mission-body"></div>
+</div>
+
+<!-- 완료 화면 -->
+<div id="complete-screen" style="display:none;padding:40px 20px;text-align:center">
+  <div style="font-size:56px;margin-bottom:16px">🎉</div>
+  <h2 style="font-size:22px;font-weight:700;color:#1A2E4A;margin-bottom:8px">모든 미션 완료!</h2>
+  <p style="font-size:14px;color:#4A5568;line-height:1.7;margin-bottom:20px">
+    수고하셨습니다.<br>강사 화면에서 최종 점수를 확인하세요.
+  </p>
+  <div style="display:inline-block;background:#FDF0E6;color:#E8650A;font-size:16px;font-weight:600;padding:14px 28px;border-radius:14px;border:2px solid #E8650A">
+    성찰일지 +5점 포함 — 최종 집계 중 ⏳
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</body>
+</html>

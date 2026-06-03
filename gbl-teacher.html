@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBL 강사 대시보드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A2E4A;--navy2:#2A4A72;--navy3:#3D6494;
+  --orange:#E8650A;--orangePl:#FDF0E6;
+  --teal:#1D9E75;--tealPl:#E1F5EE;
+  --gold:#F5A623;--goldPl:#FEF3E2;
+  --gray:#64748B;--grayLt:#F4F6F8;--grayBd:#CBD5E0;
+  --white:#FFFFFF;--text:#1A202C;--textSub:#4A5568;
+  --red:#E53E3E;--redPl:#FFF5F5;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0F1A28;color:var(--white);min-height:100vh;}
+
+/* ── HEADER ── */
+.dash-header{background:#0A1220;padding:14px 24px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.08);}
+.dash-header .logo{width:38px;height:38px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;}
+.dash-header h1{font-size:17px;font-weight:600;color:#fff;}
+.dash-header p{font-size:12px;color:#7A9ABF;margin-top:1px;}
+.live-badge{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#7A9ABF;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.time-badge{font-size:13px;color:#AABCD0;font-variant-numeric:tabular-nums;}
+
+/* ── LAYOUT ── */
+.dash-body{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 62px);overflow:hidden;}
+.sidebar{background:#0A1220;border-right:1px solid rgba(255,255,255,.08);overflow-y:auto;padding:16px;}
+.main-panel{overflow-y:auto;padding:20px;}
+
+/* ── SIDEBAR ── */
+.sidebar-section{margin-bottom:20px;}
+.sidebar-label{font-size:11px;font-weight:600;color:#7A9ABF;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+
+/* ── SCORE BOARD ── */
+.score-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:background .15s;}
+.score-row:hover{background:rgba(255,255,255,.08);}
+.score-row.selected{border-color:var(--orange);background:rgba(232,101,10,.1);}
+.score-row .rank{font-size:16px;font-weight:700;color:var(--orange);min-width:22px;}
+.score-row .rank.top{color:#FFD700;}
+.score-row .team-info{flex:1;}
+.score-row .team-name{font-size:13px;font-weight:600;color:#fff;}
+.score-row .team-members{font-size:11px;color:#7A9ABF;margin-top:1px;}
+.score-row .pts{font-size:18px;font-weight:700;color:var(--orange);}
+.score-bar-wrap{margin-top:4px;}
+.score-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:4px;}
+.score-bar-fill{height:100%;border-radius:2px;transition:width .5s;}
+
+/* 점수 부여 */
+.score-give{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-top:8px;}
+.score-give select,.score-give input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:9px 10px;font-size:13px;margin-bottom:8px;outline:none;}
+.score-give select option{background:#1A2E4A;color:#fff;}
+.score-give button{width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;}
+.score-give button:hover{background:#C8550A;}
+
+/* ── MAIN PANEL ── */
+.section-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title .badge{font-size:11px;background:var(--orange);color:#fff;padding:2px 10px;border-radius:20px;font-weight:500;}
+
+/* 제출 현황 그리드 */
+.status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.status-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;text-align:center;}
+.status-card .sc-label{font-size:11px;color:#7A9ABF;margin-bottom:8px;}
+.status-card .sc-num{font-size:28px;font-weight:700;color:var(--orange);}
+.status-card .sc-sub{font-size:11px;color:#7A9ABF;margin-top:2px;}
+.status-card.teal .sc-num{color:var(--teal);}
+.status-card.gold .sc-num{color:var(--gold);}
+
+/* 조별 제출 현황 */
+.team-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.team-status-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;}
+.team-status-card h3{font-size:14px;font-weight:600;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.mission-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;margin:2px;}
+.mission-pill.done{background:#1D9E7520;color:var(--teal);border:1px solid #1D9E7550;}
+.mission-pill.pending{background:rgba(255,255,255,.05);color:#7A9ABF;border:1px solid rgba(255,255,255,.08);}
+.member-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;margin:2px;color:#AABCD0;}
+
+/* 제출 내용 뷰어 */
+.answer-viewer{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-bottom:12px;}
+.answer-viewer h4{font-size:13px;font-weight:600;color:var(--orange);margin-bottom:10px;}
+.answer-field{margin-bottom:12px;}
+.answer-field .afl{font-size:11px;color:#7A9ABF;margin-bottom:4px;}
+.answer-field .afv{font-size:13px;color:#DDEEFF;line-height:1.7;white-space:pre-wrap;background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.06);}
+.answer-field .afv.empty{color:#7A9ABF;font-style:italic;}
+
+/* 로그 */
+.log-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;}
+.log-item .log-time{color:#7A9ABF;min-width:45px;flex-shrink:0;}
+.log-item .log-team{font-weight:600;min-width:50px;flex-shrink:0;}
+.log-item .log-msg{color:#AABCD0;}
+.log-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px;}
+
+/* ── TIMER ── */
+.timer-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;margin-bottom:16px;}
+.timer-display{font-size:36px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;text-align:center;letter-spacing:-1px;}
+.timer-sub{font-size:11px;color:#7A9ABF;text-align:center;margin-top:2px;margin-bottom:10px;}
+.timer-btns{display:flex;gap:6px;margin-bottom:8px;}
+.timer-btns button{flex:1;padding:8px;font-size:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer;}
+.tb-start{background:var(--teal);color:#fff;}
+.tb-pause{background:#2A4A72;color:#fff;}
+.tb-reset{background:rgba(255,255,255,.08);color:#fff;}
+.preset-row{display:flex;gap:4px;flex-wrap:wrap;}
+.preset-btn{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#AABCD0;cursor:pointer;}
+.preset-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--teal);color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     ★ Firebase 설정 — 학생용과 동일하게 맞출 것
+     ══════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue, set, push, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FIREBASE_CONFIG = {
+  apiKey:            "여기에_API_KEY",
+  authDomain:        "여기에_PROJECT.firebaseapp.com",
+  databaseURL:       "여기에_https://PROJECT.firebaseio.com",
+  projectId:         "여기에_PROJECT_ID",
+  storageBucket:     "여기에_PROJECT.appspot.com",
+  messagingSenderId: "여기에_SENDER_ID",
+  appId:             "여기에_APP_ID"
+};
+/* ══════════════════════════════════════════ */
+
+const SESSION = 'gbl2024';
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getDatabase(app);
+
+const TEAMS = [
+  {id:'t1', num:'1조', name:'나침반', color:'#E8650A'},
+  {id:'t2', num:'2조', name:'씨앗',   color:'#1D9E75'},
+  {id:'t3', num:'3조', name:'파도',   color:'#185FA5'},
+  {id:'t4', num:'4조', name:'별자리', color:'#7F77DD'},
+];
+const MISSIONS = ['m1','m2','m3','reflect'];
+const MISSION_LABELS = {m1:'M1 목표설정', m2:'M2 시나리오', m3:'M3 루브릭', reflect:'성찰'};
+const MISSION_FIELDS = {
+  m1:['target','goals','gbl'],
+  m2:['intro','main','close','tools','facilitator'],
+  m3:['rubric','feedback','wrap'],
+  reflect:['q1','q2','q3']
+};
+const FIELD_LABELS = {
+  target:'대상 집단', goals:'프로그램 목표', gbl:'GBL 요소 적용',
+  intro:'도입 단계', main:'전개 단계', close:'마무리 단계', tools:'사용 도구', facilitator:'촉진자 역할',
+  rubric:'평가 루브릭', feedback:'즉각적 피드백', wrap:'마무리 정리',
+  q1:'인상 깊은 장면', q2:'경험한 GBL 원리', q3:'현장 적용 아이디어'
+};
+
+let scores = {t1:0, t2:0, t3:0, t4:0};
+let members = {t1:{}, t2:{}, t3:{}, t4:{}};
+let submissions = {t1:{}, t2:{}, t3:{}, t4:{}};
+let selectedTeam = 't1';
+let selectedMission = 'm1';
+let logItems = [];
+
+// 타이머
+let timerSec = 300, timerRunning = false, timerInterval = null, timerLabel = '준비';
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderScoreBoard();
+  renderTeamStatus();
+  renderAnswerViewer();
+  renderTimer();
+
+  // ── Firebase 리스너 ──
+  onValue(ref(db, `${SESSION}/scores`), snap => {
+    const d = snap.val() || {};
+    Object.keys(d).forEach(k => { if(scores[k] !== undefined) scores[k] = d[k]; });
+    renderScoreBoard();
+    renderTeamStatus();
+  });
+
+  onValue(ref(db, `${SESSION}/members`), snap => {
+    members = snap.val() || {t1:{},t2:{},t3:{},t4:{}};
+    renderTeamStatus();
+    updateStatCards();
+  });
+
+  onValue(ref(db, `${SESSION}/submissions`), snap => {
+    submissions = snap.val() || {t1:{},t2:{},t3:{},t4:{}};
+    renderTeamStatus();
+    renderAnswerViewer();
+    updateStatCards();
+  });
+
+  onValue(ref(db, `${SESSION}/log`), snap => {
+    const d = snap.val() || {};
+    logItems = Object.values(d).sort((a,b) => (b.at||0)-(a.at||0)).slice(0,30);
+    renderLog();
+  });
+
+  setInterval(updateClock, 1000);
+  updateClock();
+});
+
+function updateClock(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  const el = document.getElementById('clock');
+  if(el) el.textContent = `${h}:${m}:${s}`;
+}
+
+/* ── 점수판 ── */
+function renderScoreBoard(){
+  const sorted = [...TEAMS].sort((a,b) => (scores[b.id]||0) - (scores[a.id]||0));
+  const maxScore = Math.max(...Object.values(scores), 1);
+  const container = document.getElementById('score-board');
+  if(!container) return;
+  container.innerHTML = '';
+  sorted.forEach((t,i) => {
+    const s = scores[t.id] || 0;
+    const pct = Math.round(s / maxScore * 100);
+    const div = document.createElement('div');
+    div.className = 'score-row' + (t.id === selectedTeam ? ' selected' : '');
+    div.innerHTML = `
+      <div class="rank${i===0?' top':''}">${i+1}</div>
+      <div class="team-info">
+        <div class="team-name">${t.num} · ${t.name}</div>
+        <div class="team-members">${Object.values(members[t.id]||{}).map(m=>m.name).join(' · ') || '—'}</div>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
+      </div>
+      <div class="pts">${s}점</div>
+    `;
+    div.addEventListener('click', () => { selectedTeam = t.id; renderAnswerViewer(); renderScoreBoard(); });
+    container.appendChild(div);
+  });
+}
+
+/* ── 점수 부여 ── */
+window.giveScore = function(){
+  const teamSel = document.getElementById('score-team-sel').value;
+  const evtSel  = document.getElementById('score-event-sel').value;
+  const pts = parseInt(evtSel);
+  if(!teamSel || isNaN(pts)) return;
+
+  const t = TEAMS.find(x=>x.id===teamSel);
+  scores[teamSel] = (scores[teamSel]||0) + pts;
+  set(ref(db, `${SESSION}/scores/${teamSel}`), scores[teamSel]);
+  push(ref(db, `${SESSION}/log`), {
+    team: t.num, teamId: teamSel,
+    event: `score_given_${pts > 0 ? '+':''}${pts}`,
+    label: document.getElementById('score-event-sel').options[document.getElementById('score-event-sel').selectedIndex].text,
+    at: serverTimestamp()
+  });
+  showToast(`${t.num} ${pts > 0 ? '+':''}${pts}점 부여`);
+};
+
+/* ── 통계 카드 ── */
+function updateStatCards(){
+  const totalMembers = Object.values(members).reduce((s,m)=>s+Object.keys(m).length,0);
+  const totalSubmits = Object.values(submissions).reduce((s,t) =>
+    s + MISSIONS.filter(mid=>t[mid]?._submitted).length, 0);
+  const el_m = document.getElementById('stat-members');
+  const el_s = document.getElementById('stat-submits');
+  if(el_m) el_m.textContent = totalMembers;
+  if(el_s) el_s.textContent = totalSubmits;
+
+  const sorted = [...TEAMS].sort((a,b)=>(scores[b.id]||0)-(scores[a.id]||0));
+  const el_top = document.getElementById('stat-top');
+  const el_top_pts = document.getElementById('stat-top-pts');
+  if(el_top) el_top.textContent = sorted[0] ? `${sorted[0].num}` : '—';
+  if(el_top_pts) el_top_pts.textContent = sorted[0] ? `${scores[sorted[0].id]||0}점` : '0점';
+}
+
+/* ── 조별 미션 현황 ── */
+function renderTeamStatus(){
+  const container = document.getElementById('team-status');
+  if(!container) return;
+  container.innerHTML = '';
+  TEAMS.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'team-status-card';
+    const memberList = Object.values(members[t.id]||{}).map(m=>
+      `<span class="member-chip">${m.name} <span style="color:${t.color};font-size:10px">${m.role||''}</span></span>`
+    ).join('');
+    const pills = MISSIONS.map(mid => {
+      const done = submissions[t.id]?.[mid]?._submitted;
+      return `<span class="mission-pill ${done?'done':'pending'}">${done?'✓ ':''} ${MISSION_LABELS[mid]}</span>`;
+    }).join('');
+    div.innerHTML = `
+      <h3 style="color:${t.color}">${t.num} · ${t.name} <span style="font-size:12px;color:#7A9ABF;font-weight:400">${scores[t.id]||0}점</span></h3>
+      <div style="margin-bottom:8px">${memberList || '<span style="font-size:12px;color:#7A9ABF">접속 대기 중...</span>'}</div>
+      <div>${pills}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* ── 제출 내용 뷰어 ── */
+function renderAnswerViewer(){
+  const container = document.getElementById('answer-viewer');
+  if(!container) return;
+  container.innerHTML = '';
+  const t = TEAMS.find(x=>x.id===selectedTeam);
+
+  // 미션 탭
+  const tabRow = document.createElement('div');
+  tabRow.style.cssText = 'display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;';
+  MISSIONS.forEach(mid => {
+    const btn = document.createElement('button');
+    btn.textContent = MISSION_LABELS[mid];
+    const done = submissions[selectedTeam]?.[mid]?._submitted;
+    btn.style.cssText = `padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;
+      background:${mid===selectedMission ? t.color : 'rgba(255,255,255,.07)'};
+      color:${mid===selectedMission ? '#fff' : (done ? '#1D9E75' : '#7A9ABF')};`;
+    btn.addEventListener('click', () => { selectedMission = mid; renderAnswerViewer(); });
+    tabRow.appendChild(btn);
+  });
+  container.appendChild(tabRow);
+
+  // 제출 내용
+  const fields = MISSION_FIELDS[selectedMission] || [];
+  const data = submissions[selectedTeam]?.[selectedMission] || {};
+  const isSubmitted = !!data._submitted;
+
+  const statusBadge = document.createElement('div');
+  statusBadge.style.cssText = `font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:12px;
+    background:${isSubmitted ? '#1D9E7520' : 'rgba(255,255,255,.06)'};
+    color:${isSubmitted ? '#1D9E75' : '#7A9ABF'};
+    border:1px solid ${isSubmitted ? '#1D9E7540' : 'rgba(255,255,255,.1)'};`;
+  statusBadge.textContent = isSubmitted ? `✓ 제출 완료 — ${data._submitted?.by || ''}` : '미제출';
+  container.appendChild(statusBadge);
+
+  fields.forEach(fk => {
+    const val = data[fk]?.value || '';
+    const div = document.createElement('div');
+    div.className = 'answer-field';
+    div.innerHTML = `
+      <div class="afl">${FIELD_LABELS[fk] || fk}</div>
+      <div class="afv${val ? '' : ' empty'}">${val || '아직 작성 전'}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* ── 로그 ── */
+function renderLog(){
+  const container = document.getElementById('activity-log');
+  if(!container) return;
+  container.innerHTML = '';
+  logItems.slice(0,15).forEach(item => {
+    const t = item.at ? new Date(item.at) : new Date();
+    const h = String(t.getHours()).padStart(2,'0');
+    const m = String(t.getMinutes()).padStart(2,'0');
+    const div = document.createElement('div');
+    div.className = 'log-item';
+    div.innerHTML = `
+      <div class="log-dot"></div>
+      <div class="log-time">${h}:${m}</div>
+      <div class="log-team" style="color:${TEAMS.find(x=>x.id===item.teamId)?.color||'#aaa'}">${item.team||''}</div>
+      <div class="log-msg">${item.label || item.event}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* ── 타이머 ── */
+function renderTimer(){
+  updateTimerDisplay();
+}
+function updateTimerDisplay(){
+  const m = Math.floor(timerSec/60);
+  const s = timerSec % 60;
+  const el = document.getElementById('timer-display');
+  if(el) el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+window.timerToggle = function(){
+  if(!timerRunning){
+    timerRunning = true;
+    document.getElementById('tb-start').style.display = 'none';
+    document.getElementById('tb-pause').style.display = 'flex';
+    timerInterval = setInterval(()=>{
+      if(timerSec <= 0){
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById('timer-sub').textContent = '⏰ 종료!';
+        document.getElementById('tb-start').style.display = 'flex';
+        document.getElementById('tb-pause').style.display = 'none';
+        return;
+      }
+      timerSec--;
+      updateTimerDisplay();
+    }, 1000);
+  }
+};
+window.timerPause = function(){
+  clearInterval(timerInterval); timerRunning = false;
+  document.getElementById('tb-start').style.display = 'flex';
+  document.getElementById('tb-pause').style.display = 'none';
+};
+window.timerReset = function(){
+  clearInterval(timerInterval); timerRunning = false;
+  timerSec = 300; updateTimerDisplay();
+  document.getElementById('timer-sub').textContent = timerLabel;
+  document.getElementById('tb-start').style.display = 'flex';
+  document.getElementById('tb-pause').style.display = 'none';
+};
+window.setTimer = function(min, label){
+  timerPause();
+  timerSec = min * 60; timerLabel = label;
+  document.getElementById('timer-sub').textContent = label;
+  updateTimerDisplay();
+};
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+
+<!-- ── DOM ── -->
+<div class="dash-header">
+  <div class="logo">GBL</div>
+  <div>
+    <h1>강사 대시보드</h1>
+    <p>게임기반 학습 · 청소년교육상담학과 · 14명</p>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div> LIVE
+    <span class="time-badge" id="clock">00:00:00</span>
+  </div>
+</div>
+
+<div class="dash-body">
+
+  <!-- ── 사이드바 ── -->
+  <div class="sidebar">
+
+    <!-- 타이머 -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">타이머</div>
+      <div class="timer-wrap">
+        <div class="timer-display" id="timer-display">05:00</div>
+        <div class="timer-sub" id="timer-sub">준비</div>
+        <div class="timer-btns">
+          <button class="tb-start" id="tb-start" onclick="timerToggle()" style="display:flex;align-items:center;justify-content:center;gap:4px">▶ 시작</button>
+          <button class="tb-pause" id="tb-pause" onclick="timerPause()" style="display:none;align-items:center;justify-content:center;gap:4px">⏸ 정지</button>
+          <button class="tb-reset" onclick="timerReset()">↺</button>
+        </div>
+        <div class="preset-row">
+          <span class="preset-btn" onclick="setTimer(5,'퀴즈레이스')">5분 퀴즈</span>
+          <span class="preset-btn" onclick="setTimer(10,'조별 논의')">10분 논의</span>
+          <span class="preset-btn" onclick="setTimer(15,'미션 게임')">15분 미션</span>
+          <span class="preset-btn" onclick="setTimer(3,'발표 준비')">3분 발표준비</span>
+          <span class="preset-btn" onclick="setTimer(7,'갤러리 워크')">7분 갤러리</span>
+          <span class="preset-btn" onclick="setTimer(10,'성찰 작성')">10분 성찰</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 점수판 -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">실시간 점수판</div>
+      <div id="score-board"></div>
+    </div>
+
+    <!-- 점수 부여 -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">점수 부여</div>
+      <div class="score-give">
+        <select id="score-team-sel">
+          <option value="">조 선택</option>
+          <option value="t1">1조 · 나침반</option>
+          <option value="t2">2조 · 씨앗</option>
+          <option value="t3">3조 · 파도</option>
+          <option value="t4">4조 · 별자리</option>
+        </select>
+        <select id="score-event-sel">
+          <option value="">이벤트 선택</option>
+          <option value="10">퀴즈 정답 +10점</option>
+          <option value="20">미션 완료 1등 +20점</option>
+          <option value="15">미션 완료 2등 / 발표 +15점</option>
+          <option value="10">미션 완료 3등 / 피드백 +10점</option>
+          <option value="5">미션 완료 4등 / 성찰일지 +5점</option>
+          <option value="-5">규칙 위반 -5점</option>
+        </select>
+        <button onclick="giveScore()">점수 부여 →</button>
+      </div>
+    </div>
+
+    <!-- 활동 로그 -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">실시간 활동 로그</div>
+      <div id="activity-log" style="font-size:12px"></div>
+    </div>
+  </div>
+
+  <!-- ── 메인 패널 ── -->
+  <div class="main-panel">
+
+    <!-- 통계 카드 -->
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="sc-label">접속 인원</div>
+        <div class="sc-num" id="stat-members">0</div>
+        <div class="sc-sub">/ 14명</div>
+      </div>
+      <div class="status-card teal">
+        <div class="sc-label">미션 제출 수</div>
+        <div class="sc-num" id="stat-submits">0</div>
+        <div class="sc-sub">/ 16건 (4조×4)</div>
+      </div>
+      <div class="status-card gold">
+        <div class="sc-label">현재 1위</div>
+        <div class="sc-num" id="stat-top" style="font-size:18px">—</div>
+        <div class="sc-sub" id="stat-top-pts">0점</div>
+      </div>
+      <div class="status-card">
+        <div class="sc-label">세션 키</div>
+        <div class="sc-num" style="font-size:16px;font-family:monospace">gbl2024</div>
+        <div class="sc-sub">학생·강사 동일</div>
+      </div>
+    </div>
+
+    <!-- 조별 미션 현황 -->
+    <div class="section-title">
+      조별 미션 제출 현황
+      <span class="badge">LIVE</span>
+    </div>
+    <div class="team-status-grid" id="team-status"></div>
+
+    <!-- 제출 내용 뷰어 -->
+    <div class="section-title">
+      제출 내용 보기
+      <span class="badge">조를 클릭해서 선택</span>
+    </div>
+    <div id="answer-viewer"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</body>
+</html>
